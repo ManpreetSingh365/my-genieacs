@@ -1,0 +1,35 @@
+services:
+  # MongoDB Service (Worker with Persistent Storage)
+  - type: worker
+    name: mongo
+    env: docker
+    dockerImage: mongo:4.4
+    disk:
+      name: mongo-data
+      mountPath: /data/db
+      sizeGB: 10
+
+  # GenieACS Service (Web Service)
+  - type: web
+    name: genieacs
+    env: docker
+    repo: https://github.com/GeiserX/genieacs-docker.git
+    branch: main
+    dockerContext: .
+    dockerfilePath: ./GenieACS.dockerfile
+    envVars:
+      - key: MONGO_CONNECTION_STRING
+        value: mongodb://mongo:27017/genieacs
+    port: 7547
+    plan: free
+
+  # GenieACS Simulator Service (Web Service)
+  - type: web
+    name: genieacs-sim
+    env: docker
+    repo: https://github.com/GeiserX/genieacs-docker.git
+    branch: main
+    dockerContext: ./simulator  # Adjust if the simulator has a specific subdirectory
+    dockerfilePath: ./simulator/Dockerfile  # Adjust path if a specific Dockerfile exists
+    port: 8080  # Adjust based on simulator's port
+    plan: free
